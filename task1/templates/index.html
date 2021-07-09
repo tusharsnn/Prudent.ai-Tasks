@@ -1,0 +1,68 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <title>Index</title>
+</head>
+<body>
+    <div class="container">
+        <h4>Enter your Movie ISBN</h4>
+        <form id="form" action="#">
+            <input type="text", id="isbn", placeholder="Movies ISBN">
+            <a id="submit-btn" class="btn">Submit</a>
+        </form>
+
+        <div class="movie_list" style="display: none;">
+            <h5>You have seen:</h5><h6 id="title"></h6>
+            <h5>These are the Top 10 recommendations you might like:</h5>
+            <ul  id="movies">
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script>
+
+        $('#submit-btn').click(function(){
+            $(".movie_list").hide()
+            movies_list = $("#movies")
+            isbn = $("input").val()
+            fetch("/books?"+"isbn="+isbn, {
+            method: "GET"
+            })
+            
+            .then(response => {
+               if(response.status!=200)
+               {
+                   alert("no isbn detail, add 0 if not 10 digits")
+                   return null
+               }
+
+               else{
+                    return response.json()
+               }
+            })
+                
+            .then(data => {
+                if(data==null){
+                    return;
+                }
+                $(".movie_list").show()
+                title = data["title"]
+                $(".movie_list #title").text(title)
+                html_data = ""
+                response_data = data["movies_list"]
+                for(let i=0;i<response_data.length; i++){
+                    html_data += "<li>"+response_data[i]+"</li>"
+                }
+                movies_list.html(html_data)
+                
+            });
+        });
+    
+    </script>
+</body>
+
+</html>
